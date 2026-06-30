@@ -1,4 +1,5 @@
-#On Raspberry Pi desktop -> pip install bme680
+# On Raspberry Pi desktop -> pip install bme680
+# What code will do: first it will find the physical chip over I2C wires, then it will configure the sensors to check the data many times to make sure it is accurate, then it will enter an infinite loop where every 10 seconds it gives the timestamp and data calculations, then after ctrl + C it will stop     
 
 import time
 import bme680
@@ -13,7 +14,7 @@ except (RuntimeError, IOError):
 
 # Oversampling for best accuracy, samples x times and averages out
 sensor.set_humidity_oversampling(bme680.OS_2X)
-sensor.set_pressure_oversample(bme680.OS_4X)
+sensor.set_pressure_oversampling(bme680.OS_4X)
 sensor.set_temperature_oversampling(bme680.OS_8X)
 sensor.set_filter(bme680.FILTER_SIZE_3)
 # turns on internal hardware filter to smooth out unrealistic spikes in data
