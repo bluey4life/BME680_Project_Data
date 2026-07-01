@@ -3,6 +3,8 @@
 
 import time
 import bme680
+import math # For humidity compensation
+from gpiozero import CPUTemperature # Measures Raspberry Pi 3 CPU heat
 from datetime import datetime
 
 try:
@@ -16,9 +18,13 @@ except (RuntimeError, IOError):
 sensor.set_humidity_oversampling(bme680.OS_2X)
 sensor.set_pressure_oversampling(bme680.OS_4X)
 sensor.set_temperature_oversampling(bme680.OS_8X)
+# Disable gas heater so temperature is not artificially increased
+sensor.set_gas_status(bme680.DISABLE_GAS_MEAS)
 sensor.set_filter(bme680.FILTER_SIZE_3)
 # turns on internal hardware filter to smooth out unrealistic spikes in data
 
+print("Sensor stabilizing for 15 minutes")
+time.sleep(900)
 print("BME680 Radiative Cooling Data Logger Started")
 print("Press Ctrl+C to stop recording.")
 
@@ -29,7 +35,7 @@ try:
     if sensor.get_sensor_data():
       # get current timestamp
       timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-      # extract properties from chip
+      # extract raw data
       temperature_c = sensor.data.temperature
       humidity_rh = sensor.data.humidity
       pressure_hpa = sensor.data.pressure
@@ -37,10 +43,7 @@ try:
       print(f"[{timestamp}] Temperature: {temperature_c:.2f} °C | Humidity: {humidity_rh:.2f} % | Pressure: {pressure_hpa:.2f} hPa")
       # look at specific variables, prints in square brackets, .2f so it rounds to two decimal places
     time.sleep(10)
-    #Wait 10 seconds before requesting next datapoint
+    # Wait 10 seconds before requesting next datapoint so it doesn't overheat
 #But if ctrl+C is pressed
 except KeyboardInterrupt:
   print("Data logging stopped")
-  
-
-      
